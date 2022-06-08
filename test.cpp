@@ -1,19 +1,20 @@
 #include "FullyMal94.h"
 #include "FullyMal94.cpp"
 #include <iostream>
+#include <string.h>
 
 using namespace std;
 
 int main() {
 
     FullyMal94 fllu;
+ 
+    char *tt = "polkjhgfdsaqwer";
 
-    BigInt _tt;
+    fllu.fromInt(string("112111108107106104103102100115097113119101114"));
 
-    _tt = "98765432101234567890987654321012345678909876543210123456789098765432101234567890987654321012345678909876543210123456789098765432101234567890987654321012345678909876543210123456789098765432101234567890";
+    cout << fllu.toBytes() << endl;
 
-    fllu.fromInt(_tt);
-
-    cout << "ola" << endl;
+    return 0;
 
 }
