@@ -18,7 +18,7 @@
 #pragma once
 
 #include <iostream>
-#include "./BigInt.hpp"
+#include "./dependencies/BigInt.hpp"
 
 using namespace std;
 
@@ -29,8 +29,6 @@ class FullyMal94 {
         string FullyMalRepres;
 
         char FullyMalTable[94];
-
-        BigInt expBigInt(BigInt base, BigInt exp);
         
     public:
 
@@ -45,4 +43,5 @@ class FullyMal94 {
 
         void fromBytes(char *bytes);
         char *toBytes();
+
 };

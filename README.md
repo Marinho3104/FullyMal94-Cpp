@@ -1,6 +1,6 @@
 # FullyMal94-Cpp
 
-Encode method 
+Encode method:
 
 -> 94 characters
 

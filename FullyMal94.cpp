@@ -15,7 +15,7 @@
 */
 
 #include "./FullyMal94.h"
-#include "./BigInt.hpp"
+#include "./dependencies/BigInt.hpp"
 #include <iostream>
 #include <vector>
 #include <stdio.h>
@@ -23,7 +23,36 @@
 
 using namespace std;
 
-BigInt FullyMal94::expBigInt(BigInt base, BigInt exp) {
+string fromIntToBinary(BigInt num) {
+
+    string val;
+
+    while(num != 0) {
+        val = ((num%2 == 0) ? string("0") : string("1")) + val;
+
+        num /= 2;
+
+    }
+
+    while (val.size() % 8 != 0) val = "0" + val; 
+
+    return val;
+
+}
+
+BigInt fromBinaryToInt(string bin) {
+
+    BigInt val = 0, baseVal = 2;
+
+    for (int _ = 0, i = bin.size() - 1; _ < bin.size(); _++, i--) val += (bin[i] == '1') ? pow(baseVal, _) : 0;
+
+    return val;
+
+}
+
+BigInt expBigInt(BigInt base, BigInt exp) {
+
+    if (exp < 2147483648) return pow(base, exp.to_int());
 
     bool odd = exp % 2 != 0 ? true : false;
 
@@ -43,15 +72,14 @@ BigInt FullyMal94::expBigInt(BigInt base, BigInt exp) {
 
     }
 
-    for(int _ = 0; _ < expCount - 1; _++) result *= pow(base, exp.to_int());
+    for(int _ = 0; _ < expCount; _++) result *= pow(base, exp.to_int());
 
-    if (odd && expCount != 0) result *= pow(base, exp.to_int() + 1);
-
-    else if (expCount == 0) result *= pow(base, exp.to_int());
-
+    if (odd) result *= result;
+    
     return result;
 
 }
+
 
 string FullyMal94::getFullyValue() {
     return this->FullyMalRepres;
@@ -65,10 +93,14 @@ void FullyMal94::setTable() {
 
 }
 
+FullyMal94::FullyMal94() { this->setTable(); }
+
 
 void FullyMal94::fromInt(BigInt num) {
 
     BigInt intPart, mutlIntPartTo94, val;
+
+    this->FullyMalRepres = string("");
 
     while(1) {
 
@@ -105,7 +137,7 @@ BigInt FullyMal94::toInt() {
 
     for (int _ = 0; _ < indexNum.size(); _++) {
 
-        _pow = this->expBigInt(94, expCount);
+        _pow = expBigInt(94, expCount);
 
         _mul = _pow * indexNum.at(_);
 
@@ -122,36 +154,28 @@ BigInt FullyMal94::toInt() {
 void FullyMal94::fromBytes(char *bytes) {
     
     string bytesAll;
+    int byteSize = 8 * strlen(bytes);
+    BigInt val;
 
-    for (int _ = 0; _ < strlen(bytes); _++) {
-        
-        string _temp = to_string(int(bytes[_]));
+    for (int _ = 0; _ < strlen(bytes); _++) bytesAll += fromIntToBinary(int(bytes[_]));
 
-        for (int __ = 0; __ < 3 - _temp.size(); __++) _temp = "0" + _temp;
+    for (int _ = 0, i = byteSize - 1; _ < byteSize; _++, i--) val += (bytesAll[i] == '1') ? expBigInt(2, _) : 0;
 
-        bytesAll += _temp;
-    }
-
-    this->fromInt(bytesAll);
+    this->fromInt(val);
 
 }
 
 char *FullyMal94::toBytes() {
 
-    string _val = this->toInt().to_string();
+    string _val = fromIntToBinary(this->toInt());
 
-    while(_val.size() % 3 != 0) _val = "0" + _val;
+    while(_val.size() % 8 != 0) _val = "0" + _val;
 
-    char *bytes = (char*) malloc(sizeof(char) * (_val.size() / 3));
+    char *bytes = (char*) malloc(sizeof(char) * (_val.size() / 8 + 1));
 
-    for (int _ = 0, i = 0; _ < _val.size(); _+=3, i++) bytes[i] = int(stoi(_val.substr(_, 3)));
+    bytes[_val.size() / 8] = 0;
+ 
+    for (int _ = 0, i = 0; _ < _val.size(); _+=8, i++) bytes[i] = fromBinaryToInt(_val.substr(_, 8)).to_int();
 
     return bytes;
-}
-
-
-FullyMal94::FullyMal94() {
-
-    this->setTable();
-
 }
